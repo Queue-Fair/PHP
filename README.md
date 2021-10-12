@@ -32,13 +32,11 @@ This can introduce a dependency between our systems, which is why most customers
 
 The Server-Side Adapter is a small library that will run when visitors access your site. It periodically checks to see if you have changed your Queue-Fair settings in the Portal, but other than that if the visitor is requesting a page that does not match any queue's Activation Rules, it does nothing.
 
-If a visitor requests a page that DOES match any queue's Activation Rules, the Adapter makes a determination whether that particular visitor should be queued. If so, the visitor is sent to our Queue Servers and execution and generation of the page for that HTTP request for that visitor will cease. If the Adapter determines that the visitor should not be queued, it sets a cookie to indicate that the visitor has been processed and your page executes and shows as normal.
+If a visitor requests a page that DOES match any queue's Activation Rules, the Adapter consults the Queue-Fair queue servers to make a determination whether that particular visitor should be queued. If so, the visitor is sent to our Queue Servers and execution and generation of the page for that HTTP request for that visitor will cease. If the Adapter determines that the visitor should not be queued, it sets a cookie to indicate that the visitor has been processed and your page executes and shows as normal.
 
-Thus the Server-Side Adapter prevents visitors from skipping the queue by disabling the Client-Side JavaScript Adapter, and also reduces load on your web server when things get busy.
+Thus the Server-Side Adapter prevents technically skilled visitors from skipping the queue by disabling the Client-Side JavaScript Adapter, and also reduces load on your web server when things get busy.
 
-This guide assumes you already have a functional Java web server. Tomcat is used as a base example - see later on in this document for other Java web servers. You don't have to use a servlet container to use this code.
-
-You will need PHP version 5.4 or above to run the Server-Side Adapter.
+This guide assumes you already have a functional web server with PHP version 5.4 or above. Apache2 is used as a base example, but you can use any web server that supports PHP.
 
 Here's every keystroke for the install.
 
@@ -95,7 +93,7 @@ The debug logging statements will appear in whichever file php has been set-up t
 
 **12.** When you have finished making changes to `QueueFairConfig.php`, hit `CTRL-O` to save and `CTRL-X` to exit nano.
 
-To make the Adapter actually run, you need to edit whichever file on your server produces the page(s) you wish to protect.   You should ensure that the Adapter is the first thing that is run when generating any page.  If you have a global header file that outputs the opening HTML of your pages, then that is a good place.  **Make sure you make a back up copy of the index.php file before editing.** 
+To make the Adapter actually run, you need to edit whichever file on your server produces the page(s) you wish to protect.   You should ensure that the Adapter is the first thing that is run when generating any page.  If you have a global header file that outputs the opening <HTML> tag of your pages, then that is a good place.  **Make sure you make a back up copy of the any file you need to change before editing.** 
 
 ```
     nano /var/www/mysite/header.php
@@ -126,11 +124,9 @@ This will ensure that the adapter is the first thing that runs when a vistor acc
 
 The `if` statement prevents the Adapter from running on background PHP AJAX and RestAPI calls - you really only want the Adapter to run on page requests.
 
-In the case where the Adapter sends the request elsewhere (for example to show the user a queue page), the `go()` method will return false and the rest of the page will NOT be generated, which means it isn't sent to the visitor's browser, which makes it secure, as well as preventing your server from having to do the work of producing the rest of the page.  It is important that this code runs *before* the PHP framework initialises so that your server can perform this under load, when the full PHP framework is too onerous to load.
+In the case where the Adapter sends the request elsewhere (for example to show the user a queue page), the `go()` method will return false and the rest of the page will NOT be generated, which means it isn't sent to the visitor's browser, which makes it secure, as well as preventing your server from having to do the work of producing the rest of the page.  It is important that this code runs *before* any PHP framework you may be using initialises so that your server can perform this under load, when your full PHP framework is too onerous to load.
 
 **NOTE:** If your PHP server is sitting behind a proxy, CDN or load balancer, you may need to edit the property sets in the above stanza to use values from forwarded headers instead.  If you need help with this, contact Queue-Fair support.
-
-**NOTE:** To work properly, 
 
 Tap `CTRL-O` to save and `CTRL-X` to exit nano.  **You should also back up the index.php file after making your changes** in case it gets overwritten by any future update.
 
