@@ -128,7 +128,7 @@ In the case where the Adapter sends the request elsewhere (for example to show t
 
 **NOTE:** If your PHP server is sitting behind a proxy, CDN or load balancer, you may need to edit the property sets in the above stanza to use values from forwarded headers instead.  If you need help with this, contact Queue-Fair support.
 
-Tap `CTRL-O` to save and `CTRL-X` to exit nano.  **You should also back up the index.php file after making your changes** in case it gets overwritten by any future update.
+Tap `CTRL-O` to save and `CTRL-X` to exit nano.  **You should also back up the the file after making your changes** in case it gets overwritten by any future update.
 
 That's it you're done!
 
