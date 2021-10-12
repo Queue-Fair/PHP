@@ -93,7 +93,7 @@ The debug logging statements will appear in whichever file php has been set-up t
 
 **12.** When you have finished making changes to `QueueFairConfig.php`, hit `CTRL-O` to save and `CTRL-X` to exit nano.
 
-To make the Adapter actually run, you need to edit whichever file on your server produces the page(s) you wish to protect.   You should ensure that the Adapter is the first thing that is run when generating any page.  If you have a global header file that outputs the opening <HTML> tag of your pages, then that is a good place.  **Make sure you make a back up copy of the any file you need to change before editing.** 
+To make the Adapter actually run, you need to edit whichever file on your server produces the page(s) you wish to protect.   You should ensure that the Adapter is the first thing that is run when generating any page.  If you have a global header file that outputs the opening <HTML> tag of your pages, then that is a good place.  **Make sure you make a back up copy of any file you need to change before editing.** 
 
 ```
     nano /var/www/mysite/header.php
