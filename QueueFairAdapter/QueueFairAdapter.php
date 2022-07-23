@@ -242,8 +242,8 @@ class QueueFairAdapter
             } else {
                 $ret = true;
             }
-        } else if ($rule -> match == "RegExp") {
-            if(preg_match("/".$test."/",$comp) === 1) {
+        } elseif ($rule -> match == "RegExp") {
+            if(preg_match("/".$test."/", $comp) === 1) {
                 $ret = true;
             } else {
                 $ret = false;
