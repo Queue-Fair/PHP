@@ -169,6 +169,45 @@ The Server-Side Adapter contains multiple checks to prevent visitors bypassing t
  -  The Server-Side Adapter also checks that passed cookies were produced within the time limit set by Passed Lifetime on the queue Settings page, to prevent visitors trying to cheat by tampering with cookie expiration times or sharing cookie values.  So, the Passed Lifetime should be set to long enough for your visitors to complete their transaction, plus an allowance for those visitors that are slow, but no longer.
  - The signature also includes the visitor's USER_AGENT, to further prevent visitors from sharing cookie values.
 
+## Hybrid Security Model
+
+Many customers prefer to use the JavaScript Adapter to send people to the queue and receive people from the queue, and just check to see if a Passed Cookie is present before accepting an order, as described in the Technical Guide.
+
+So, if you don't want to run the full Adapter process, and just want to check the PassedCookie, then the code you need for that looks like this instead:
+
+```
+require_once "QueueFairConfig.php";
+require_once "QueueFairAdapter.php";
+
+$queueFair = new QueueFair\Adapter\QueueFairAdapter(new QueueFair\Adapter\QueueFairConfig());
+
+$queueFair->requestedURL = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https://" : "http://")
+    .$_SERVER["HTTP_HOST"].$_SERVER["REQUEST_URI"];
+$queueFair->query = $_SERVER["QUERY_STRING"];
+$queueFair->remoteAddr = $_SERVER["REMOTE_ADDR"];
+$queueFair->userAgent = $_SERVER["HTTP_USER_AGENT"];
+$queueFair->cookies = $_COOKIE;
+
+if(strpos($queueFair->requestedURL,"/path/to/protected/page")!== FALSE) {
+try {
+    $passedLifetimeMinutes = 60;            //One hour passed lifetime
+    $queueName="QUEUE_SYSTEM_NAME_FROM_PORTAL";
+    $queueSecret="QUEUE_SECRET_FROM_PORTAL";
+    if(!$queueFair->validateCookie($queueSecret,
+        $passedLifetimeMinutes,
+        $queueFair->getCookie($queueFair->cookieNameBase.$queueName))) {
+        // Redirect visitor to error page.
+        $queueFair->redirect("https://".$queueFair->config->account.".queue-fair.net/".$queueName."?qfError=InvalidCookie",1);
+    }
+} catch (Exception $err) {
+    // Any exception means you probably want to show the page.
+    error_log("QF ERROR ".$err->getMessage());
+}
+// Page will continue execution...
+
+```
+
+
 ## AND FINALLY
 
 All client-modifiable settings are in `QueueFairConfig.php` .  You should never find you need to modify `QueueFairAdapter.php` - but if something comes up, please contact support@queue-fair.com right away so we can discuss your requirements.
