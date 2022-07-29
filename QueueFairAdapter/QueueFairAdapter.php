@@ -298,7 +298,7 @@ class QueueFairAdapter
             return false;
         }
 
-        if (!$this->validateCookie($queue, $queueCookie)) {
+        if (!$this->validateCookieWithQueue($queue, $queueCookie)) {
             if ($this->d) {
                 $this->log(__LINE__, "Cookie failed validation " . $queueCookie);
             }
@@ -312,7 +312,7 @@ class QueueFairAdapter
         return true;
     }
 
-    protected function getCookie($cname)
+    public function getCookie($cname)
     {
 
         if (!isset($this->cookies[$cname])) {
@@ -714,7 +714,7 @@ class QueueFairAdapter
             ->adapterResult->queue] = true;
     }
 
-    protected function redirect($loc, $sleep)
+    public function redirect($loc, $sleep)
     {
         if ($sleep > 0) {
             sleep($sleep);
@@ -937,7 +937,7 @@ class QueueFairAdapter
         return hash_hmac('sha256', $message, $secret);
     }
 
-    protected function validateCookie($queue, $cookie)
+    public function validateCookie($queueSecret, $passedLifetimeMinutes, $cookie)
     {
         if ($this->d) {
             $this->log(__LINE__, "Validating cookie " . $cookie);
@@ -954,7 +954,7 @@ class QueueFairAdapter
             $hpos = strrpos($cookie, "qfh=");
             $check = substr($cookie, 0, $hpos);
 
-            $checkHash = $this->createHash($queue->secret, $this->processIdentifier($this->userAgent).$check);
+            $checkHash = $this->createHash($queueSecret, $this->processIdentifier($this->userAgent).$check);
 
             if ($hash != $checkHash) {
                 if ($this->d) {
@@ -964,7 +964,7 @@ class QueueFairAdapter
             }
 
             $tspos = $parsed["qfts"];
-            if ($tspos < time() - ($queue->passedLifetimeMinutes * 60)) {
+            if ($tspos < time() - ($passedLifetimeMinutes * 60)) {
                 if ($this->d) {
                     $this->log(__LINE__, "Cookie timestamp too old " . (time() - $tspos));
                 }
@@ -981,6 +981,10 @@ class QueueFairAdapter
             }
         }
         return false;
+    }
+
+    protected function validateCookieWithQueue($queue, $cookie) {
+        return $this->validateCookie($queue->secret, $queue->passedLifetimeMinutes, $cookie);
     }
 
     protected function validateQuery($queue)
@@ -1132,7 +1136,7 @@ class QueueFairAdapter
                     if ($this->d) {
                         $this->log(__LINE__, "Query validation failed but we have cookie " . $queueCookie);
                     }
-                    if ($this->validateCookie($queue, $queueCookie)) {
+                    if ($this->validateCookieWithQueue($queue, $queueCookie)) {
                         if ($this->d) {
                             $this->log(__LINE__, "...and the cookie is valid. That's fine.");
                         }
@@ -1202,3 +1206,4 @@ class QueueFairAdapter
         return $this->continuePage;
     }
 }
+
