@@ -20,7 +20,7 @@ class QueueFairConfig
     
     //Time limit for Passed Strings to be considered valid,
     //before and after the current time
-    public $queryTimeLimitSeconds=30;
+    public $queryTimeLimitSeconds=300;
     
     //Valid values are true, false, or an "IP_address".	
     public $debug=true;
