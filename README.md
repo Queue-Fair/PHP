@@ -128,6 +128,8 @@ In the case where the Adapter sends the request elsewhere (for example to show t
 
 **NOTE:** If your PHP server is sitting behind a proxy, CDN or load balancer, you may need to edit the property sets in the above stanza to use values from forwarded headers instead.  If you need help with this, contact Queue-Fair support.
 
+**IMPORTANT** Unlike the JavaScript Client-Side Adapter, which only runs in browsers that run JavaScript and only on browsers requesting page URLs that contain the Adapter tag, the Server-Side Adapter may run on every request. That means if you have automated systems that call API or callback URLs on your site (such as payment gateways), and your Activation Rules match those URLs, they will also be queued when things get busy, which can have adverse effects. We recommend that you exclude API or callback URLs from the Adapter in logic in your code - you can also use the Activation Rules to achieve this.
+
 Tap `CTRL-O` to save and `CTRL-X` to exit nano.  **You should also back up the the file after making your changes** in case it gets overwritten by any future update.
 
 That's it you're done!
