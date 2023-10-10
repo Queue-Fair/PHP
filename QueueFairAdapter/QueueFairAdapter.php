@@ -237,7 +237,7 @@ class QueueFairAdapter
         } elseif ($rule->match == "Contain" && $comp != null && $comp != "" && strpos($comp, $test) !== false) {
             $ret = true;
         } elseif ($rule->match == "Exist") {
-            if (!isset($comp) || $comp == null || "" == comp) {
+            if (!isset($comp) || $comp == null || "" == $comp) {
                 $ret = false;
             } else {
                 $ret = true;
