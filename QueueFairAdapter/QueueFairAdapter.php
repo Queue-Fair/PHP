@@ -214,7 +214,7 @@ class QueueFairAdapter
 
     public function isRuleMatch($rule)
     {
-        $comp=$this->extractComponent($rule,$this->getURL(),$this->getCookie($rule->name));
+	$comp=$this->extractComponent($rule,$this->getURL(),isset($rule->name) ? $this->getCookie($rule->name) : "");
         return $this->isRuleMatchWithValue($rule,$comp);
     }
 
