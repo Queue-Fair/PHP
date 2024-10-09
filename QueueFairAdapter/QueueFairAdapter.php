@@ -18,6 +18,8 @@ class QueueFairAdapter
 
     public $adapterResult = null;
 
+    public $adapterQueue = null;
+
     public $passedString = null;
 
     public $passedQueues = [];
