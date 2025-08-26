@@ -106,11 +106,14 @@ if(strpos($_SERVER["REQUEST_URI"],"/rest/") === false && strpos($_SERVER["REQUES
     require_once "QueueFairAdapter.php";
     
     $queueFair = new QueueFair\Adapter\QueueFairAdapter(new QueueFair\Adapter\QueueFairConfig());
-    
-    $queueFair->requestedURL = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https://" : "http://")
+
+
+    $queueFair->requestedURL = ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on')
+        || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === "https")
+        ? "https://" : "http://")
         .$_SERVER["HTTP_HOST"].$_SERVER["REQUEST_URI"];
+    $queueFair->remoteAddr = isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER["REMOTE_ADDR"];
     $queueFair->query = $_SERVER["QUERY_STRING"];
-    $queueFair->remoteAddr = $_SERVER["REMOTE_ADDR"];
     $queueFair->userAgent = $_SERVER["HTTP_USER_AGENT"];
     $queueFair->cookies = $_COOKIE;
     
@@ -126,7 +129,7 @@ The `if` statement prevents the Adapter from running on background PHP AJAX and 
 
 In the case where the Adapter sends the request elsewhere (for example to show the user a queue page), the `go()` method will return false and the rest of the page will NOT be generated, which means it isn't sent to the visitor's browser, which makes it secure, as well as preventing your server from having to do the work of producing the rest of the page.  It is important that this code runs *before* any PHP framework you may be using initialises so that your server can perform this under load, when your full PHP framework is too onerous to load.
 
-**NOTE:** If your PHP server is sitting behind a proxy, CDN or load balancer, you may need to edit the property sets in the above stanza to use values from forwarded headers instead.  If you need help with this, contact Queue-Fair support.
+**NOTE:** If your PHP server is sitting behind a proxy, CDN or load balancer, you may need to edit the property sets in the above stanza to use values from forwarded headers instead if the header names in your set-up differ from the industry standard (x-forwarded-for and x-forwarded-proto).  If you need help with this, contact Queue-Fair support.
 
 **IMPORTANT** Unlike the JavaScript Client-Side Adapter, which only runs in browsers that run JavaScript and only on browsers requesting page URLs that contain the Adapter tag, the Server-Side Adapter may run on every request. That means if you have automated systems that call API or callback URLs on your site (such as payment gateways), and your Activation Rules match those URLs, they will also be queued when things get busy, which can have adverse effects. We recommend that you exclude API or callback URLs from the Adapter in logic in your code - you can also use the Activation Rules to achieve this.
 
@@ -183,10 +186,13 @@ require_once "QueueFairAdapter.php";
 
 $queueFair = new QueueFair\Adapter\QueueFairAdapter(new QueueFair\Adapter\QueueFairConfig());
 
-$queueFair->requestedURL = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https://" : "http://")
-    .$_SERVER["HTTP_HOST"].$_SERVER["REQUEST_URI"];
+
+$queueFair->requestedURL = ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on')
+        || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === "https")
+        ? "https://" : "http://")
+        .$_SERVER["HTTP_HOST"].$_SERVER["REQUEST_URI"];
+$queueFair->remoteAddr = isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER["REMOTE_ADDR"];
 $queueFair->query = $_SERVER["QUERY_STRING"];
-$queueFair->remoteAddr = $_SERVER["REMOTE_ADDR"];
 $queueFair->userAgent = $_SERVER["HTTP_USER_AGENT"];
 $queueFair->cookies = $_COOKIE;
 
